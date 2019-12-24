@@ -170,6 +170,15 @@ func getname(name string) string {
 	return name
 }
 
+func downloadBody(inst *Instagram, url string) (io.Reader, error) {
+	resp, err := inst.c.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Body, nil
+}
+
 func download(inst *Instagram, url, dst string) (string, error) {
 	file, err := os.Create(dst)
 	if err != nil {
@@ -177,12 +186,12 @@ func download(inst *Instagram, url, dst string) (string, error) {
 	}
 	defer file.Close()
 
-	resp, err := inst.c.Get(url)
+	body, err := downloadBody(inst, url)
 	if err != nil {
 		return "", err
 	}
 
-	_, err = io.Copy(file, resp.Body)
+	_, err = io.Copy(file, body)
 	return dst, err
 }
 
@@ -424,6 +433,24 @@ func (item *Item) Download(folder, name string) (imgs, vds string, err error) {
 	}
 
 	return imgs, vds, fmt.Errorf("cannot find any image or video")
+}
+
+func (item *Item) DownloadBody() (imgs, vds string, body io.Reader, err error) {
+	inst := item.media.instagram()
+
+	vds = GetBest(item.Videos)
+	if vds != "" {
+		body, err = downloadBody(inst, vds)
+		return "", vds, body, err
+	}
+
+	imgs = GetBest(item.Images.Versions)
+	if imgs != "" {
+		body, err = downloadBody(inst, imgs)
+		return imgs, "", body, err
+	}
+
+	return imgs, vds, nil, fmt.Errorf("cannot find any image or video")
 }
 
 // TopLikers returns string slice or single string (inside string slice)

@@ -170,7 +170,7 @@ func getname(name string) string {
 	return name
 }
 
-func downloadBody(inst *Instagram, url string) (io.Reader, error) {
+func downloadBody(inst *Instagram, url string) (io.ReadCloser, error) {
 	resp, err := inst.c.Get(url)
 	if err != nil {
 		return nil, err
@@ -190,6 +190,8 @@ func download(inst *Instagram, url, dst string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	defer func() { _ = body.Close() }()
 
 	_, err = io.Copy(file, body)
 	return dst, err
@@ -435,7 +437,7 @@ func (item *Item) Download(folder, name string) (imgs, vds string, err error) {
 	return imgs, vds, fmt.Errorf("cannot find any image or video")
 }
 
-func (item *Item) DownloadBody() (imgs, vds string, body io.Reader, err error) {
+func (item *Item) DownloadBody() (imgs, vds string, body io.ReadCloser, err error) {
 	inst := item.media.instagram()
 
 	vds = GetBest(item.Videos)

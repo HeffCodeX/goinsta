@@ -1,3 +1,3 @@
-module github.com/heffcodex/goinsta/v2
+module github.com/heffcodex/goinsta/v2m
 
-go 1.12
+go 1.14

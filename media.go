@@ -46,6 +46,20 @@ type StoryCTA struct {
 	} `json:"links"`
 }
 
+// SponsorTag represent brand mention
+type SponsorTag struct {
+	Permission bool `json:"permission"`
+	Sponsor    struct {
+		Pk            int    `json:"pk"`
+		Username      string `json:"username"`
+		FullName      string `json:"full_name"`
+		IsPrivate     bool   `json:"is_private"`
+		ProfilePicURL string `json:"profile_pic_url"`
+		ProfilePicID  string `json:"profile_pic_id"`
+		IsVerified    bool   `json:"is_verified"`
+	} `json:"sponsor"`
+}
+
 // Item represents media items
 //
 // All Item has Images or Videos objects which contains the url(s).
@@ -89,6 +103,7 @@ type Item struct {
 		In []Tag `json:"in"`
 	} `json:"usertags,omitempty"`
 	FbUserTags           Tag    `json:"fb_user_tags"`
+	SponsorTags          []SponsorTag `json:"sponsor_tags"`
 	CanViewerSave        bool   `json:"can_viewer_save"`
 	OrganicTrackingToken string `json:"organic_tracking_token"`
 	// Images contains URL images in different versions.

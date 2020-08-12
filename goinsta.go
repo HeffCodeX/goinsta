@@ -180,6 +180,10 @@ func (inst *Instagram) Export(path string) error {
 	return ioutil.WriteFile(path, bytes, 0644)
 }
 
+func (inst *Instagram) GetCookieJar() http.CookieJar {
+	return inst.c.Jar
+}
+
 // Export exports selected *Instagram object options to an io.Writer
 func Export(inst *Instagram, writer io.Writer) error {
 	url, err := neturl.Parse(goInstaAPIUrl)

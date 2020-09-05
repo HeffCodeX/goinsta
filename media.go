@@ -452,22 +452,36 @@ func (item *Item) Download(folder, name string) (imgs, vds string, err error) {
 	return imgs, vds, fmt.Errorf("cannot find any image or video")
 }
 
-func (item *Item) DownloadBody() (imgs, vds string, body io.ReadCloser, err error) {
-	inst := item.media.instagram()
-
+func (item *Item) GetBestURL() (imgs, vds string, err error) {
 	vds = GetBest(item.Videos)
 	if vds != "" {
-		body, err = downloadBody(inst, vds)
-		return "", vds, body, err
+		return
 	}
 
 	imgs = GetBest(item.Images.Versions)
 	if imgs != "" {
-		body, err = downloadBody(inst, imgs)
-		return imgs, "", body, err
+		return
 	}
 
-	return imgs, vds, nil, fmt.Errorf("cannot find any image or video")
+	err = fmt.Errorf("cannot find any image or video")
+	return
+}
+
+func (item *Item) DownloadBody() (imgs, vds string, body io.ReadCloser, err error) {
+	inst := item.media.instagram()
+
+	imgs, vds, err = item.GetBestURL()
+	if err != nil {
+		return
+	}
+
+	if vds != "" {
+		body, err = downloadBody(inst, vds)
+	} else if imgs != "" {
+		body, err = downloadBody(inst, imgs)
+	}
+
+	return
 }
 
 // TopLikers returns string slice or single string (inside string slice)
